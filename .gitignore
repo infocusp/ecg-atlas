@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.data-cache/
+test-results/
+*.tsbuildinfo
+.DS_Store
+.env
+.env.*
+!.env.example
+*.log
+playwright-report/
+.secrets/
+*.pem
+*.key
+*service-account*.json
+*credentials*.json
