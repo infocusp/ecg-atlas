@@ -1,3 +1,5 @@
+![ECG Atlas — Explore the heart. Understand the ECG.](docs/media/ecg-atlas-banner.png)
+
 # ECG Atlas
 
 A standalone educational ECG explorer, using Plethscape's BodyParts3D anatomy assets and a small attributed PhysioNet signal library.
@@ -11,6 +13,14 @@ A standalone educational ECG explorer, using Plethscape's BodyParts3D anatomy as
 - Shared-scale ECG plots, placement comparisons, pause/scrub controls, and a recorded-signal library.
 - ECG-first layout with a larger waveform and a compact beating-heart view; switch to “Place electrodes” to explore the full body.
 - Optional “Follow heartbeat” popup with separate electrical-activity and blood-circulation lessons, synchronized ECG, pause, and step controls. P/QRS/T explanations stay hidden until requested.
+
+## Watch the demo
+
+[![Watch the ECG Atlas demo: heart animation and live ECG](docs/media/ecg-atlas-demo-preview.jpg)](docs/media/ecg-atlas-demo.mp4)
+
+**[▶ Watch or download the demo](docs/media/ecg-atlas-demo.mp4)** · 60 seconds · 1.2× playback · approximately 2.2 MB
+
+Explore heartbeat lessons, move electrodes, compare lead setups, and switch heart conditions. Click the preview to open the MP4; if your Markdown viewer does not play it inline, download it using the link above. Playback is accelerated for presentation, not physiological timing. Educational only—not for diagnosis.
 
 ## Credits and licensing
 
@@ -39,7 +49,7 @@ The interface requests fonts from Google Fonts; system fallbacks are supplied. E
 
 ## Tests and contributing
 
-The public notice identifies the app as educational and not clinically validated. **Start guided lesson** begins a slow normal-heart close-up; **Explain this ECG** opens the causal lesson. A source badge next to each trace distinguishes recorded ECG from teaching reconstructions. Visitors who prefer reduced motion start with playback paused. Credits and limitations are available from the notice on every screen size.
+The public notice identifies the app as educational and not clinically validated. **Follow heartbeat** opens an optional slow lesson for the selected condition, with electrical-activity and blood-circulation views. A source badge next to each trace distinguishes recorded ECG from teaching reconstructions. Visitors who prefer reduced motion start with playback paused. Credits and limitations are available from the notice on every screen size.
 
 ```sh
 npm test
@@ -55,8 +65,6 @@ Browser checks use Playwright Chromium by default. Set `BROWSER_CHANNEL=chrome` 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for architecture, changes to physiology, and the release checklist. GitHub Actions checks the unit tests, production build, and functional browser tests.
 
 Retain attribution and the educational notice when sharing screenshots or video. The initial anatomy includes roughly 10 MB of model assets, so first-load time depends on connection and hosting; local browser checks are not a mobile-network performance certification.
-
-<!-- TODO: attach a demo video/GIF here once recorded. -->
 
 Select a pad and click **Place on body**, or drag a pad directly. The focused 3D canvas also supports arrow keys to move the selected pad across the visible skin; Shift increases the step. Orbit to reach the back. Pause and scrub to inspect the synchronized electrical illustration.
 
@@ -87,7 +95,7 @@ Plots use a fixed 500 Hz simulation-time grid, a bounded sample cache, and fract
 
 ## Heart-to-ECG lessons
 
-Use **Explain this pattern** to open the synchronized teaching panel, **Slow & focus** to watch the heart closely, and **Step +0.1 s** to pause and advance both animations and ECG together. The diagram separates atria, AV conduction, and ventricles; coloured plot bands identify authored timing. These are teaching labels, not an ECG interpretation algorithm.
+Use **Follow heartbeat** or **Explain this pattern** to open the synchronized lesson popup, **Lesson speed** to slow playback, and **Next moment · 0.1 s** to pause and advance the lesson and ECG together. The diagram separates atria, AV conduction, and ventricles; coloured plot bands identify authored timing. These are teaching labels, not an ECG interpretation algorithm.
 
 The additional PVC, 2:1 atrial flutter, first-degree AV block, Mobitz I, Mobitz II, complete block and monomorphic VT lessons use **authored event schedules with recorded-normal waveform components**, not newly acquired disease recordings. P/QRS/T components from the PTB normal example are endpoint-detrended and recombined. Ectopic QRS complexes are widened and polarity-reversed; flutter waves are authored. This is a limited illustrative morphology model, not a validated reconstruction of those diseases. The library retains only the four original recorded excerpts.
 
