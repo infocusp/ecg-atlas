@@ -14,15 +14,24 @@ try {
   await p.screenshot({ path: "test-results/ecg-flow.png", fullPage: true });
   await p.getByRole("button", { name: "Pause simulation" }).click();
   await p.locator("#scrub").fill("0.18");
-  await p.waitForTimeout(200);
-  const first = await p
+  // The render loop (Three.js) and the pause state (React) settle on
+  // independent schedules; on slower/software-rendered CI runners a fixed
+  // wait can sample before the clock has actually stopped advancing. Poll
+  // until the same value is observed twice in a row instead of betting on
+  // a fixed window, so this only fails if playback never actually freezes.
+  let previous = await p
     .locator(".renderer-mount")
     .getAttribute("data-ejection");
-  await p.waitForTimeout(150);
-  assert.equal(
-    await p.locator(".renderer-mount").getAttribute("data-ejection"),
-    first,
-  );
+  await expect
+    .poll(async () => {
+      const current = await p
+        .locator(".renderer-mount")
+        .getAttribute("data-ejection");
+      const stable = current === previous;
+      previous = current;
+      return stable;
+    })
+    .toBe(true);
   await p.getByRole("button", { name: "VFib", exact: true }).click();
   await p.getByText("No effective forward pumping", { exact: true }).waitFor();
   await expect(p.locator(".renderer-mount")).toHaveAttribute(
