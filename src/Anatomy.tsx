@@ -23,6 +23,7 @@ type Props = {
   focus: boolean;
   view: number;
   flow: boolean;
+  electrical?: boolean;
   cycle: React.RefObject<CardiacCycle | null>;
 };
 export default function Anatomy(props: Props) {
@@ -161,6 +162,7 @@ export default function Anatomy(props: Props) {
           });
           internals.push(o);
           o.userData.flowVessel = isVessel;
+          o.userData.isHeart = isHeart;
           if (isHeart)
             heartParts.push({
               mesh: o,
@@ -430,11 +432,18 @@ export default function Anatomy(props: Props) {
       }
       skins.forEach((m) => {
         (m.material as THREE.MeshPhysicalMaterial).opacity = p.xray
-          ? 0.19
+          ? p.focus
+            ? 0.025
+            : 0.19
           : 0.9;
       });
       internals.forEach(
-        (m) => (m.visible = p.xray && (!m.userData.flowVessel || p.flow)),
+        (m) =>
+          (m.visible =
+            p.xray &&
+            (p.focus
+              ? !!m.userData.isHeart
+              : !m.userData.flowVessel || p.flow)),
       );
       const cycle = p.cycle.current;
       if (bloodFlow) {
@@ -456,8 +465,9 @@ export default function Anatomy(props: Props) {
         el.dataset.ejection = cycle.ejection.toFixed(3);
         el.dataset.flowEnabled = String(p.flow && p.xray);
       }
-      conduction.visible = p.xray;
-      arrow.visible = p.xray && !p.flow && !patterns[p.condition];
+      conduction.visible = p.xray && p.electrical !== false;
+      arrow.visible =
+        p.xray && p.electrical !== false && !p.flow && !patterns[p.condition];
       const v = new THREE.Vector3(...p.vector.current);
       const len = v.length();
       if (len > 0.0001) {
@@ -470,7 +480,9 @@ export default function Anatomy(props: Props) {
         : null;
       const phase = cycle?.phase ?? "Rest";
       injuryRegion.visible =
-        p.xray && ["anterior", "inferior", "ischemia"].includes(p.condition);
+        p.electrical !== false &&
+        p.xray &&
+        ["anterior", "inferior", "ischemia"].includes(p.condition);
       injuryRegion.position
         .copy(center)
         .add(

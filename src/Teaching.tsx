@@ -136,12 +136,14 @@ export default function Teaching({
   time,
   onSlow,
   onStep,
+  compactControls = false,
 }: {
   condition: Condition;
   cycle: CardiacCycle | null;
   time: number;
   onSlow: () => void;
   onStep: () => void;
+  compactControls?: boolean;
 }) {
   const lesson = lessons[condition],
     state = patterns[condition] ? patternState(condition, time) : null;
@@ -330,19 +332,21 @@ export default function Teaching({
         pink: wide ventricular activation · red: blocked atrial impulse ·
         orange: ST teaching interval.
       </p>
-      <div className="teaching-actions">
-        <button
-          onClick={() =>
-            document
-              .querySelector(".signal-heading")
-              ?.scrollIntoView({ behavior: "smooth", block: "start" })
-          }
-        >
-          Back to live ECG ↑
-        </button>
-        <button onClick={onSlow}>Slow & focus · 0.2×</button>
-        <button onClick={onStep}>Step +0.1 s</button>
-      </div>
+      {!compactControls && (
+        <div className="teaching-actions">
+          <button
+            onClick={() =>
+              document
+                .querySelector(".signal-heading")
+                ?.scrollIntoView({ behavior: "smooth", block: "start" })
+            }
+          >
+            Back to live ECG ↑
+          </button>
+          <button onClick={onSlow}>Slow & focus · 0.2×</button>
+          <button onClick={onStep}>Step +0.1 s</button>
+        </div>
+      )}
       {patterns[condition] && (
         <p className="teaching-timing">
           {patterns[condition]!.rhythm}. Fixed teaching timing; playback speed

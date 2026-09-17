@@ -24,6 +24,10 @@ try {
     "VT",
   ]) {
     await page.getByRole("button", { name, exact: true }).click();
+    await page
+      .locator(".public-actions")
+      .getByRole("button", { name: "Follow heartbeat", exact: true })
+      .click();
     await expect(page.locator(".teaching-panel")).toContainText(
       "Inside the heart",
     );
@@ -31,11 +35,12 @@ try {
       "What appears on the ECG",
     );
     await page
-      .getByRole("button", { name: "Step +0.1 s", exact: true })
+      .getByRole("button", { name: "Next moment · 0.1 s", exact: true })
       .click();
     await expect(
-      page.getByRole("button", { name: "Play simulation", exact: true }),
+      page.getByRole("button", { name: "Play lesson", exact: true }),
     ).toBeVisible();
+    await page.getByRole("button", { name: "Close heartbeat lesson" }).click();
   }
   await expect(page.locator("#rate")).toBeDisabled();
   assert.equal(await page.locator("#rate").inputValue(), "180");
@@ -50,12 +55,13 @@ try {
     "0.000",
   );
   await page
-    .getByRole("button", { name: "Slow & focus · 0.2×", exact: true })
+    .getByRole("button", {
+      name: "Why this ECG? · Follow heartbeat",
+      exact: true,
+    })
     .click();
   await page.waitForTimeout(150);
-  await page
-    .getByRole("button", { name: "Pause simulation", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Pause lesson", exact: true }).click();
   await page.locator(".signals-panel").evaluate((el) => {
     el.scrollTop = 0;
   });

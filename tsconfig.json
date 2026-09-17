@@ -12,7 +12,8 @@
     "verbatimModuleSyntax": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "strict": true
+    "strict": true,
+    "types": ["react", "react-dom", "three"]
   },
   "include": ["src", "vite.config.ts"]
 }

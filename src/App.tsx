@@ -4,7 +4,6 @@ import {
   ArrowUpRight,
   ChevronDown,
   Expand,
-  Layers,
   Pause,
   Play,
   Plus,
@@ -16,7 +15,6 @@ import {
   BookOpen,
   Move,
   Copy,
-  HeartPulse,
 } from "lucide-react";
 import Anatomy from "./Anatomy";
 import Traces from "./Traces";
@@ -36,7 +34,7 @@ import {
 import type { Condition, Electrode, Point, Signal } from "./ecg";
 import { cardiacCycle } from "./cardiacCycle";
 import { patterns } from "./patterns";
-import Teaching, { lessons } from "./Teaching";
+import HeartbeatLesson from "./HeartbeatLesson";
 import type { CardiacCycle } from "./cardiacCycle";
 export default function App() {
   const [electrodes, setElectrodes] = useState<Electrode[]>(
@@ -51,8 +49,8 @@ export default function App() {
     ),
     [speed, setSpeed] = useState(1),
     [time, setTime] = useState(8),
-    [xray, setXray] = useState(true),
-    [focus, setFocus] = useState(false),
+    [lessonOpen, setLessonOpen] = useState(false),
+    [focus, setFocus] = useState(true),
     [view, setView] = useState(0),
     [setup, setSetup] = useState("2-electrode"),
     [advanced, setAdvanced] = useState(false),
@@ -69,12 +67,23 @@ export default function App() {
       "Select an electrode, then place it anywhere on the body.",
     ),
     [sources, setSources] = useState(false),
-    [flow, setFlow] = useState(true),
     [cycleView, setCycleView] = useState<CardiacCycle | null>(null);
   const clock = useRef(8),
     stageRef = useRef(""),
     vector = useRef<Point>([0, 0, 0]),
     cycle = useRef<CardiacCycle | null>(null);
+  const beforeLesson = useRef({ running: true, speed: 1 });
+  const openLesson = () => {
+    beforeLesson.current = { running, speed };
+    setSpeed(0.2);
+    setRunning(true);
+    setLessonOpen(true);
+  };
+  const closeLesson = () => {
+    setLessonOpen(false);
+    setSpeed(beforeLesson.current.speed);
+    setRunning(beforeLesson.current.running);
+  };
   const live = useRef({ running, speed, rate, condition, library });
   live.current = { running, speed, rate, condition, library };
   useEffect(() => {
@@ -163,6 +172,7 @@ export default function App() {
         .some((b) => b.id !== "RL" && distance(a.position, b.position) < 0.025),
   );
   const changePreset = (name: string) => {
+    setFocus(false);
     setSetup(name);
     setElectrodes(preset(name));
     setSelected("LA");
@@ -305,18 +315,8 @@ export default function App() {
           </span>
         </div>
         <div className="public-actions">
-          <button
-            className="start-lesson"
-            onClick={() => {
-              reset();
-              setSpeed(0.2);
-              setFocus(true);
-              setXray(true);
-              setTab("explore");
-              document.querySelector(".signals-panel")?.scrollTo({ top: 0 });
-            }}
-          >
-            Start guided lesson
+          <button className="start-lesson" onClick={openLesson}>
+            Follow heartbeat
           </button>
           <button onClick={() => setSources(true)}>
             Credits & limitations
@@ -396,6 +396,7 @@ export default function App() {
                 className={placing ? "primary active" : "primary"}
                 onClick={() => {
                   setPlacing((v) => !v);
+                  setFocus(false);
                   if (innerWidth < 621)
                     document
                       .querySelector(".scene-panel")
@@ -458,15 +459,8 @@ export default function App() {
                 </button>
               ))}
             </div>
-            <button
-              className="compare-normal"
-              onClick={() =>
-                document
-                  .querySelector(".teaching-panel")
-                  ?.scrollIntoView({ behavior: "smooth", block: "nearest" })
-              }
-            >
-              Explain this pattern ↓
+            <button className="compare-normal" onClick={openLesson}>
+              Explain this pattern
             </button>
             <div className="range-label">
               <label htmlFor="rate">
@@ -560,13 +554,6 @@ export default function App() {
                       The electrical heart <span>3D</span>
                     </div>
                   </div>
-                  <button
-                    className={"view-chip " + (xray ? "active" : "")}
-                    onClick={() => setXray((v) => !v)}
-                  >
-                    <Layers size={14} />
-                    {xray ? "Inside the body" : "Skin surface"}
-                  </button>
                 </div>
                 <Anatomy
                   electrodes={electrodes}
@@ -578,64 +565,24 @@ export default function App() {
                   condition={condition}
                   stage={stageRef}
                   vector={vector}
-                  xray={xray}
+                  xray={true}
                   focus={focus}
                   view={view}
-                  flow={flow}
+                  flow={false}
+                  electrical={false}
                   cycle={cycle}
                 />
-                <div className="flow-key">
-                  <span>
-                    <i className="electric" /> Electrical activation
-                  </span>
-                  {flow && (
-                    <>
-                      <span>
-                        <i className="oxygenated" /> Blood toward body
-                      </span>
-                      <span>
-                        <i className="deoxygenated" /> Blood toward lungs
-                      </span>
-                    </>
-                  )}
-                  <small>Colour and speed are illustrative</small>
-                  {["anterior", "inferior", "ischemia"].includes(condition) && (
-                    <small>
-                      Orange patch: schematic altered electrical region
-                    </small>
-                  )}
-                </div>
                 <div className="body-side-label">
                   PATIENT’S RIGHT <span>↔</span> PATIENT’S LEFT
                 </div>
                 <div className="scene-tools">
-                  <button
-                    className={flow ? "active" : ""}
-                    aria-pressed={flow}
-                    onClick={() => {
-                      setFlow((v) => !v);
-                      setXray(true);
-                    }}
-                  >
-                    Blood flow {flow ? "on" : "off"}
-                  </button>
-                  <button
-                    onClick={() => {
-                      setFlow(true);
-                      setXray(true);
-                      setFocus(true);
-                      setSpeed(0.2);
-                      setRunning(true);
-                    }}
-                  >
-                    Follow a heartbeat · 0.2×
-                  </button>
+                  <button onClick={openLesson}>Follow heartbeat</button>
                   <button
                     className={focus ? "active" : ""}
                     onClick={() => setFocus((v) => !v)}
                   >
                     <Scan size={16} />
-                    {focus ? "Whole body" : "Heart detail"}
+                    {focus ? "Place electrodes" : "ECG & heart"}
                   </button>
                   <button
                     className="icon"
@@ -653,62 +600,6 @@ export default function App() {
                   <span>Drag to rotate · scroll to zoom</span>
                 </div>
               </div>
-              <div
-                className="cycle-story"
-                aria-label="Electrical activity and blood flow"
-              >
-                <div className="cycle-story-heading">
-                  <strong>Electricity first. Blood movement follows.</strong>
-                  <span>{cycleView?.phase ?? "…"}</span>
-                </div>
-                <div className="cycle-steps">
-                  <div>
-                    <b>1 · Electrical signal</b>
-                    <span>{cycleView?.electrical ?? "Loading…"}</span>
-                  </div>
-                  <div
-                    className={(cycleView?.squeeze ?? 0) > 0.1 ? "active" : ""}
-                  >
-                    <b>2 · Muscle response</b>
-                    <span>{cycleView?.mechanical ?? "Loading…"}</span>
-                  </div>
-                  <div
-                    className={
-                      (cycleView?.ejection ?? 0) > 0.05 ? "active blood" : ""
-                    }
-                  >
-                    <b>3 · Blood movement</b>
-                    <span>{cycleView?.blood ?? "Loading…"}</span>
-                  </div>
-                </div>
-                <p>
-                  The ECG records electrical activation and recovery—not blood
-                  moving through the electrodes.
-                </p>
-              </div>
-              <div className="conduction-bar">
-                <span className="conduction-icon">
-                  <HeartPulse size={22} />
-                </span>
-                <div>
-                  <span className="eyebrow">INSIDE THIS MOMENT</span>
-                  <strong>
-                    {stageRef.current || "Loading the recorded heartbeat…"}
-                  </strong>
-                </div>
-                <div className="phase-chips">
-                  {["P", "QRS", "T"].map((p) => (
-                    <span
-                      key={p}
-                      className={
-                        stageRef.current.startsWith(p + " ·") ? "active" : ""
-                      }
-                    >
-                      {p}
-                    </span>
-                  ))}
-                </div>
-              </div>
               <div className="playback">
                 <button
                   className="play"
@@ -718,9 +609,7 @@ export default function App() {
                   {running ? <Pause size={17} /> : <Play size={17} />}
                 </button>
                 <div className="scrub">
-                  <label htmlFor="scrub">
-                    Explore a moment <span>{(time % 12).toFixed(1)} s</span>
-                  </label>
+                  <label htmlFor="scrub">Pause or scrub the ECG</label>
                   <input
                     id="scrub"
                     type="range"
@@ -827,19 +716,8 @@ export default function App() {
                   ? "Recorded normal + authored ST changes"
                   : "Recorded ECG · illustrative placement model"}
             </div>
-            <p className="lesson-preview">{lessons[condition].ecg}</p>
-            <button
-              className="start-lesson explain-cta"
-              onClick={() => {
-                setSpeed(0.2);
-                setFocus(true);
-                setXray(true);
-                document
-                  .querySelector(".teaching-panel")
-                  ?.scrollIntoView({ behavior: "smooth", block: "start" });
-              }}
-            >
-              Explain this ECG →
+            <button className="explain-cta" onClick={openLesson}>
+              Why this ECG? · Follow heartbeat
             </button>
           </div>
           <div className="trace-controls">
@@ -876,13 +754,13 @@ export default function App() {
             ) : signal ? (
               <Traces
                 signal={signal}
+                rowHeight={220}
                 electrodes={electrodes}
                 leads={shown}
                 condition={condition}
                 rate={rate}
                 clock={clock}
                 compare={compare}
-                cycle={cycle}
                 gain={gain}
                 span={span}
               />
@@ -911,22 +789,6 @@ export default function App() {
                 : "The trace compares electrical potential at the electrodes. Moving a pad can change the shape, size and direction of the waveform."}
             </p>
           </div>
-          <Teaching
-            condition={condition}
-            cycle={cycleView}
-            time={time}
-            onSlow={() => {
-              setSpeed(0.2);
-              setRunning(true);
-              setFocus(true);
-              setXray(true);
-            }}
-            onStep={() => {
-              setRunning(false);
-              clock.current += 0.1;
-              setTime(clock.current);
-            }}
-          />
           <div className="condition-note">
             <span className="eyebrow">{conditions[condition].name}</span>
             <p>{conditions[condition].description}</p>
@@ -979,6 +841,29 @@ export default function App() {
           </button>
         </aside>
       </div>
+      {lessonOpen && signal && (
+        <HeartbeatLesson
+          condition={condition}
+          cycle={cycleView}
+          time={time}
+          running={running}
+          speed={speed}
+          onClose={closeLesson}
+          onToggle={() => setRunning((v) => !v)}
+          onStep={() => {
+            setRunning(false);
+            clock.current += 0.1;
+            setTime(clock.current);
+          }}
+          onSpeed={setSpeed}
+          signal={signal}
+          electrodes={electrodes}
+          leads={shown.slice(0, 3)}
+          rate={rate}
+          clock={clock}
+          cycleRef={cycle}
+        />
+      )}
       {sources && (
         <div className="modal-backdrop" onClick={() => setSources(false)}>
           <div
@@ -1024,15 +909,13 @@ export default function App() {
               </a>
             </p>
             <p>
-              Blood particles follow selected artery centre-lines from the
-              anatomical source. Red marks outflow toward the body; blue marks
-              outflow toward the lungs. Not all connecting vessels are shown,
-              and the particles do not represent a complete circuit or
-              calibrated flow speed. Heart squeezing and ejection timing are
-              illustrative and follow the recorded R peaks. In VF, directional
-              pumping stops; AFib preserves irregular ventricular timing without
-              a coordinated atrial squeeze. STEMI examples do not predict
-              pumping efficiency.{" "}
+              The optional circulation lesson shows schematic outflow and return
+              routes: body → right heart → lungs → left heart → body. These are
+              conceptual paths, not extracted vessel geometry or calibrated flow
+              speeds. Heart squeezing and ejection timing are illustrative and
+              follow the recorded R peaks. In VF, directional pumping stops;
+              AFib preserves irregular ventricular timing without a coordinated
+              atrial squeeze. STEMI examples do not predict pumping efficiency.{" "}
               <a
                 href="https://openstax.org/books/anatomy-and-physiology-2e/pages/19-3-cardiac-cycle"
                 target="_blank"

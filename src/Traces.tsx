@@ -23,6 +23,7 @@ type Props = {
   span: number;
   raw?: boolean;
   cycle?: React.RefObject<CardiacCycle | null>;
+  rowHeight?: number;
 };
 export default function Traces(props: Props) {
   const ref = useRef<HTMLCanvasElement>(null),
@@ -39,8 +40,10 @@ export default function Traces(props: Props) {
       raf = requestAnimationFrame(draw);
       if (document.hidden) return;
       const p = latest.current;
+      const rowHeight = p.rowHeight ?? 145,
+        rowScale = rowHeight / 145;
       const w = canvas.clientWidth,
-        h = p.leads.length * 145;
+        h = p.leads.length * rowHeight;
       const dpr = Math.min(devicePixelRatio, 2);
       if (
         canvas.width !== Math.round(w * dpr) ||
@@ -49,8 +52,14 @@ export default function Traces(props: Props) {
         canvas.width = Math.round(w * dpr);
         canvas.height = Math.round(h * dpr);
       }
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.clearRect(0, 0, w, h);
+      ctx.setTransform(dpr, 0, 0, dpr * rowScale, 0, 0);
+      ctx.clearRect(0, 0, w, h / rowScale);
+      const labelAt = (text: string, x: number, y: number) => {
+        ctx.save();
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.fillText(text, x, y * rowScale);
+        ctx.restore();
+      };
       const left = 46,
         right = w - 14,
         width = right - left;
@@ -110,7 +119,7 @@ export default function Traces(props: Props) {
       }
       const time = p.clock.current;
       const bands: { start: number; end: number; color: string }[] = [];
-      if (!p.raw) {
+      if (!p.raw && p.cycle) {
         if (patterns[p.condition]) {
           const events = patternEvents(
             p.condition,
@@ -152,8 +161,9 @@ export default function Traces(props: Props) {
         left + (((first + i) / hz - (time - p.span)) / p.span) * width;
       const bounds = canvas.getBoundingClientRect(),
         parent = canvas.parentElement!.getBoundingClientRect();
-      const visibleTop = Math.max(0, parent.top) - bounds.top,
-        visibleBottom = Math.min(innerHeight, parent.bottom) - bounds.top;
+      const visibleTop = (Math.max(0, parent.top) - bounds.top) / rowScale,
+        visibleBottom =
+          (Math.min(innerHeight, parent.bottom) - bounds.top) / rowScale;
       p.leads.forEach((lead, k) => {
         if ((k + 1) * 145 < visibleTop || k * 145 > visibleBottom) return;
         const y = k * 145,
@@ -231,12 +241,12 @@ export default function Traces(props: Props) {
         ctx.restore();
         ctx.fillStyle = lead.color;
         ctx.font = "600 14px system-ui";
-        ctx.fillText(lead.label, 12, y + 17);
+        labelAt(lead.label, 12, y + 17);
         ctx.fillStyle = "#8c9a9d";
         ctx.font = "11px monospace";
-        ctx.fillText("mV", 12, y + 35);
-        ctx.fillText("0", 25, baseline + 4);
-        ctx.fillText("1", 25, baseline - scale + 4);
+        labelAt("mV", 12, y + 35);
+        labelAt("0", 25, baseline + 4);
+        labelAt("1", 25, baseline - scale + 4);
         const clipped = history.some(
           ({ values }) =>
             baseline - values[k] * scale < y + 24 ||
@@ -244,11 +254,11 @@ export default function Traces(props: Props) {
         );
         if (clipped) {
           ctx.fillStyle = "#edb77a";
-          ctx.fillText("Clipped · reduce gain", left + 38, y + 143);
+          labelAt("Clipped · reduce gain", left + 38, y + 143);
           ctx.fillStyle = "#8c9a9d";
         }
         ctx.textAlign = "right";
-        ctx.fillText(
+        labelAt(
           p.raw
             ? "RECORDED"
             : lead.terms
@@ -261,9 +271,9 @@ export default function Traces(props: Props) {
           y + 17,
         );
         ctx.textAlign = "left";
-        ctx.fillText(`−${p.span}s`, left, y + 143);
+        labelAt(`−${p.span}s`, left, y + 143);
         ctx.textAlign = "right";
-        ctx.fillText(
+        labelAt(
           p.cycle?.current ? `now · ${p.cycle.current.phase}` : "now",
           right,
           y + 143,
@@ -278,7 +288,7 @@ export default function Traces(props: Props) {
     <canvas
       ref={ref}
       className="trace-canvas"
-      style={{ height: props.leads.length * 145 }}
+      style={{ height: props.leads.length * (props.rowHeight ?? 145) }}
       role="img"
       aria-label={`${props.leads.map((l) => l.label).join(", ")} ECG waveforms; amplitude in millivolts`}
     />

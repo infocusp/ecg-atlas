@@ -15,7 +15,9 @@ try {
       ),
     ).toBeVisible();
     await expect(
-      page.getByRole("button", { name: "Start guided lesson", exact: true }),
+      page
+        .locator(".public-actions")
+        .getByRole("button", { name: "Follow heartbeat", exact: true }),
     ).toBeVisible();
     assert(
       await page.evaluate(
@@ -24,10 +26,26 @@ try {
       `${width}px overflow`,
     );
   }
+  const ecg = await page.locator(".signals-panel").boundingBox();
+  const anatomy = await page.locator(".main-surface").boundingBox();
+  assert(ecg.width > anatomy.width, "ECG should have more space than anatomy");
+  await expect(page.locator(".teaching-panel")).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "Place electrodes", exact: true }),
+  ).toBeVisible();
   await page
-    .getByRole("button", { name: "Start guided lesson", exact: true })
+    .locator(".public-actions")
+    .getByRole("button", { name: "Follow heartbeat", exact: true })
     .click();
-  await expect(page.getByLabel("Playback speed")).toHaveValue("0.2");
+  await expect(page.getByLabel("Lesson speed")).toHaveValue("0.2");
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(
+    page
+      .locator(".public-actions")
+      .getByRole("button", { name: "Follow heartbeat", exact: true }),
+  ).toBeFocused();
+  await expect(page.getByLabel("Playback speed")).toHaveValue("1");
   await page
     .getByRole("button", { name: "Credits & limitations", exact: true })
     .click();
@@ -38,10 +56,13 @@ try {
     "Teaching reconstruction",
   );
   await page
-    .getByRole("button", { name: "Explain this ECG →", exact: true })
+    .getByRole("button", {
+      name: "Why this ECG? · Follow heartbeat",
+      exact: true,
+    })
     .click();
   await page
-    .getByRole("button", { name: "Back to live ECG ↑", exact: true })
+    .getByRole("button", { name: "Close heartbeat lesson", exact: true })
     .click();
   await page.screenshot({
     path: "test-results/ecg-public-desktop.png",

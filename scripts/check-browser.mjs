@@ -32,11 +32,9 @@ try {
     fullPage: true,
   });
   await page.getByRole("button", { name: "AFib", exact: true }).click();
-  await page
-    .getByText("Disorganised atria · irregular ventricular response", {
-      exact: true,
-    })
-    .waitFor();
+  assert(
+    await page.getByRole("button", { name: "AFib", exact: true }).isVisible(),
+  );
   await page.getByRole("button", { name: "VFib", exact: true }).click();
   assert(await page.locator("#rate").isDisabled());
   await page.getByRole("button", { name: /Signal library/ }).click();

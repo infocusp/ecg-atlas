@@ -9,7 +9,8 @@ A standalone educational ECG explorer, using Plethscape's BodyParts3D anatomy as
 - Free electrode placement and two-electrode, three-electrode, standard 12-lead, and wearable presets.
 - Recorded normal, AFib, and VF excerpts, plus explicitly authored ST-elevation/depression and rhythm/conduction teaching examples.
 - Shared-scale ECG plots, placement comparisons, pause/scrub controls, and a recorded-signal library.
-- Synchronized electrical activation, illustrative heart contraction, and arterial blood-flow animation.
+- ECG-first layout with a larger waveform and a compact beating-heart view; switch to “Place electrodes” to explore the full body.
+- Optional “Follow heartbeat” popup with separate electrical-activity and blood-circulation lessons, synchronized ECG, pause, and step controls. P/QRS/T explanations stay hidden until requested.
 
 ## Credits and licensing
 
@@ -96,7 +97,7 @@ Teaching references: [ACC/AHA/HRS conduction guideline](https://www.jacc.org/doi
 
 ### Blood-flow illustration
 
-The blood overlay reuses 18 arterial centre-line segments in Plethscape's BodyParts3D metadata. Red particles travel on systemic arterial segments; blue particles travel on the pulmonary trunk. Source gaps are preserved. Veins are visible as anatomical context; the animated particles are not a complete closed circulation. Position, speed, cardiac squeezing, and the delay between electrical activation and ejection are teaching illustrations. Both animations and the chart use the same recorded R-peak clock, including AF irregularity. VF disables effective pumping. STEMI examples make no claim about ejection fraction. The heart-to-electrode dashed lines have been removed; electrodes sense potential differences, not blood flow. The cardiac-cycle explanation follows [OpenStax](https://openstax.org/books/anatomy-and-physiology-2e/pages/19-3-cardiac-cycle).
+The optional blood-circulation lesson replaces the incomplete arterial-only overlay with a schematic circuit: body → systemic veins → right heart → pulmonary arteries → lungs → pulmonary veins → left heart → systemic arteries → body. It also explains the coronary circulation supplying the heart muscle. These routes are conceptual, not measured 3D vessel paths; particle speed, contraction, and ejection timing are teaching illustrations, not estimates of blood pressure or output. The lesson and ECG share one clock, including AF irregularity; VF disables effective forward pumping. STEMI examples make no claim about ejection fraction. Electrodes sense potential differences, not blood flow. References: [OpenStax cardiac cycle](https://openstax.org/books/anatomy-and-physiology-2e/pages/19-3-cardiac-cycle) and [circulatory pathways](https://openstax.org/books/anatomy-and-physiology-2e/pages/20-5-circulatory-pathways).
 
 ## Assets
 

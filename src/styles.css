@@ -1548,6 +1548,186 @@ input[type="range"] {
   background: #202e2e;
   border-bottom: 1px solid #3b504b;
 }
+/* ECG-first hierarchy: details are opt-in, not a second always-running dashboard. */
+@media (min-width: 921px) {
+  .workspace {
+    grid-template-columns: 230px minmax(250px, 0.72fr) minmax(430px, 1.28fr);
+  }
+  .signals-panel {
+    padding: 24px;
+  }
+  .traces {
+    max-height: min(55vh, 620px);
+  }
+}
+.signal-heading .eyebrow {
+  color: #b8d9c5;
+}
+.signal-heading h2 {
+  font-size: 24px;
+}
+.explain-cta {
+  background: transparent;
+  color: #a7cbbb;
+  padding: 7px 0;
+  border: 0;
+}
+.condition-note {
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+}
+.heartbeat-dialog {
+  color: #e6efeb;
+  background: #182325;
+  border: 1px solid #536962;
+  border-radius: 16px;
+  padding: 28px;
+  width: min(1240px, calc(100vw - 40px));
+  max-height: 90dvh;
+  overflow: auto;
+}
+.heartbeat-dialog::backdrop {
+  background: #060d11d9;
+  backdrop-filter: blur(5px);
+}
+.heartbeat-dialog h2 {
+  margin: 10px 70px 10px 0;
+  font-size: 26px;
+}
+.heartbeat-dialog p {
+  color: #b7c8c2;
+  font-size: 13px;
+  line-height: 1.65;
+}
+.lesson-close {
+  float: right;
+  padding: 8px 12px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #31443d;
+}
+.lesson-topic {
+  display: flex;
+  gap: 8px;
+  margin: 20px 0 12px;
+}
+.lesson-topic button {
+  padding: 10px 16px;
+}
+.lesson-topic button[aria-pressed="true"] {
+  background: #cde6d3;
+  color: #162820;
+}
+.lesson-transport {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 12px 0 18px;
+  border-bottom: 1px solid #3d514a;
+}
+.lesson-transport button {
+  padding: 8px 12px;
+}
+.lesson-transport label,
+.lesson-transport span {
+  font-size: 12px;
+  color: #b7c8c2;
+}
+.lesson-transport select {
+  width: auto;
+  margin-left: 8px;
+}
+.lesson-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.12fr;
+  gap: 24px;
+  align-items: start;
+}
+.lesson-layout .teaching-panel {
+  margin: 16px 0 0;
+}
+.lesson-ecg {
+  position: sticky;
+  top: 45px;
+  min-width: 0;
+  padding-top: 16px;
+}
+.lesson-ecg .trace-canvas {
+  width: 100%;
+}
+.lesson-mechanics {
+  border-left: 2px solid #edb77a;
+  padding: 12px;
+  background: #233431;
+}
+.circulation-lesson {
+  padding: 16px 0;
+}
+.circulation-lesson svg {
+  width: 100%;
+}
+.circulation-lesson svg text {
+  fill: #e1eeea;
+  font: 14px system-ui;
+}
+.circulation-routes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.circulation-routes div {
+  display: grid;
+  gap: 5px;
+  font-size: 12px;
+}
+.circulation-routes span {
+  color: #a9bfb6;
+}
+.circulation-lesson details {
+  margin: 16px 0;
+  font-size: 13px;
+}
+.circulation-lesson a {
+  font-size: 12px;
+  color: #cde6d3;
+}
+@media (max-width: 920px) {
+  .workspace {
+    display: flex;
+    flex-direction: column;
+  }
+  .signals-panel {
+    order: 0;
+    display: flex;
+    width: 100%;
+    padding: 20px;
+  }
+  .main-surface {
+    order: 1;
+  }
+  .sidebar {
+    order: 2;
+  }
+  .scene-panel {
+    height: 380px;
+    min-height: 380px;
+  }
+  .traces {
+    max-height: 440px;
+  }
+  .heartbeat-dialog {
+    padding: 18px;
+    width: calc(100vw - 20px);
+  }
+  .lesson-layout {
+    grid-template-columns: 1fr;
+  }
+  .lesson-ecg {
+    position: static;
+  }
+}
 .public-notice strong {
   display: block;
   font-size: 14px;
